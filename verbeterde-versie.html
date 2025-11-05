@@ -1,0 +1,1392 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inbraakveilig - Opmetingsblad (meerdere deuren)</title>
+  <style>
+    :root{
+      --accent:#383E42;
+      --accent-dark:#2f3437;
+      --red-button:#F44336;
+      --red-button-hover:#D32F2F;
+      --text:#101214;
+      --bg:#f4f5f6;
+      --card:#ffffff;
+      --muted:#6b6b6b;
+      --success:#4CAF50;
+      --warning:#FF9800;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);padding:20px;color:var(--text)}
+    .container{max-width:1100px;margin:0 auto}
+    .card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 6px 20px rgba(11,12,14,0.04);margin-bottom:18px;transition:box-shadow 0.3s ease}
+    .card:hover{box-shadow:0 8px 24px rgba(11,12,14,0.08)}
+    header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    header h1{font-size:20px;margin:0;font-weight:800;color:var(--accent)}
+    header p{margin:0;color:var(--muted);font-size:13px}
+    .meta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+    @media(max-width:1000px){.meta-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:700px){.meta-grid{grid-template-columns:1fr}}
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-weight:600}
+    input[type=text],input[type=date],textarea,input[type=search],select{
+      width:100%;padding:10px;border-radius:8px;border:1px solid #e6e6e6;
+      background:#fff;font-size:14px;color:var(--text);
+      transition:border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type=text]:focus,input[type=date]:focus,textarea:focus,input[type=search]:focus,select:focus{
+      outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(56,62,66,0.1);
+    }
+    textarea{min-height:56px;resize:vertical}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+    .btn{
+      padding:10px 14px;border-radius:8px;border:0;font-weight:600;cursor:pointer;
+      font-size:14px;display:inline-flex;align-items:center;gap:8px;
+      transition:all .2s ease;position:relative;overflow:hidden;
+    }
+    .btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+    .btn:active{transform:translateY(0)}
+    .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+    .btn-primary{background:var(--accent);color:#fff;}
+    .btn-primary.btn-red{background:var(--red-button);color:#fff;}
+    .btn-primary.btn-red:hover{background:var(--red-button-hover);}
+    .btn-success{background:var(--success);color:#fff;}
+    .btn-ghost{background:#fff;border:1px solid #ddd;color:var(--text)}
+    .btn-ghost:hover{background:#f9f9f9;border-color:#bbb}
+    .door-list{display:flex;flex-direction:column;gap:12px}
+    .door{
+      border-radius:10px;background:#fff;border:2px solid #eee;padding:12px;
+      transition:all 0.3s ease;
+    }
+    .door:hover{border-color:#d0d5dd;box-shadow:0 4px 12px rgba(0,0,0,0.06)}
+    .door-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .door-title{font-weight:800;color:var(--accent);display:flex;align-items:center;gap:8px}
+    .door-badge{
+      background:var(--accent);color:white;padding:2px 8px;border-radius:12px;
+      font-size:11px;font-weight:700;
+    }
+    .door-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .door-body{
+      max-height:600px;overflow-y:auto;padding-right:8px;margin-top:12px;
+    }
+    .door-body::-webkit-scrollbar{width:8px;}
+    .door-body::-webkit-scrollbar-track{background:#f1f1f1;border-radius:4px;}
+    .door-body::-webkit-scrollbar-thumb{background:#888;border-radius:4px;}
+    .door-body::-webkit-scrollbar-thumb:hover{background:#555;}
+    .option{
+      display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:8px;
+      background:#ffffff;border:2px solid #d0d5dd;margin-bottom:10px;
+      box-shadow:0 1px 3px rgba(0,0,0,0.08);
+      transition:all 0.2s ease;
+    }
+    .option:hover{border-color:#a0a8b0;box-shadow:0 2px 6px rgba(0,0,0,0.12)}
+    .option.selected{border-color:var(--accent);background:#f8f9fa}
+    .option-row{display:flex;gap:12px;align-items:flex-start}
+    .option input[type=checkbox]{
+      width:20px;height:20px;margin-top:6px;accent-color:var(--accent);
+      cursor:pointer;transition:transform 0.2s;
+    }
+    .option input[type=checkbox]:hover{transform:scale(1.1)}
+    .meta{flex:1}
+    .meta label{font-weight:700;color:var(--text);display:block}
+    .muted{color:var(--muted);font-size:13px;margin-top:4px}
+    .small{min-width:80px;text-align:left;font-weight:700;color:var(--accent);margin-left:8px;white-space:nowrap;}
+    footer{text-align:center;color:var(--muted);font-size:13px;margin-top:18px}
+    .muted-very{color:#9aa0a6;font-size:12px}
+    .artikel-block{
+      background:var(--accent);color:#ffffff;padding:12px;border-radius:10px;
+      box-shadow:0 2px 8px rgba(56,62,66,0.15);margin-top:10px;border:1px solid rgba(0,0,0,0.1);
+    }
+    .artikel-block label{color:#fff;font-weight:700;margin-bottom:8px;display:block;}
+    .artikel-block .artikel-select{
+      background:#ffffff;color:#000;border:1px solid #ccc;padding:8px;
+      border-radius:8px;width:100%;font-weight:600;margin-bottom:8px;
+    }
+    .artikel-block .artikel-select option{color:#000;background:#ffffff;}
+    .artikel-list{display:flex;flex-direction:column;gap:8px;}
+    .artikel-item{
+      display:flex;gap:8px;align-items:center;
+      background:rgba(255,255,255,0.1);padding:8px;border-radius:6px;
+    }
+    .artikel-item-text{flex:1;font-size:13px;}
+    .artikel-remove-btn{
+      background:var(--red-button);color:white;border:none;
+      border-radius:4px;padding:4px 8px;cursor:pointer;
+      font-size:12px;font-weight:600;
+    }
+    .artikel-remove-btn:hover{background:var(--red-button-hover);}
+    .artikel-add-btn{
+      background:#4CAF50;color:white;border:none;
+      border-radius:6px;padding:8px 12px;cursor:pointer;
+      font-size:13px;font-weight:600;margin-top:8px;
+    }
+    .artikel-add-btn:hover{background:#45a049;}
+    .photo-upload-zone{
+      border:2px dashed #d0d5dd;border-radius:8px;padding:20px;
+      text-align:center;background:#fafafa;margin-bottom:16px;
+      transition:all 0.3s ease;cursor:pointer;
+    }
+    .photo-upload-zone:hover{border-color:var(--accent);background:#f5f5f5}
+    .photo-upload-zone.dragover{border-color:var(--success);background:#e8f5e9}
+    .photo-upload-zone input[type=file]{display:none}
+    .photos{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+    .thumb-container{position:relative;display:inline-block}
+    .thumb{width:84px;height:84px;object-fit:cover;border-radius:6px;border:2px solid #ddd;cursor:pointer;transition:transform 0.2s}
+    .thumb:hover{transform:scale(1.05);border-color:var(--accent)}
+    .thumb-remove{
+      position:absolute;top:-6px;right:-6px;background:var(--red-button);
+      color:white;border:none;border-radius:50%;width:22px;height:22px;
+      cursor:pointer;font-size:14px;line-height:1;display:flex;
+      align-items:center;justify-content:center;opacity:0;
+      transition:opacity 0.2s;
+    }
+    .thumb-container:hover .thumb-remove{opacity:1}
+    .toast{
+      position:fixed;bottom:20px;right:20px;background:var(--accent);
+      color:white;padding:16px 20px;border-radius:8px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.3);z-index:1000;
+      animation:slideIn 0.3s ease;max-width:300px;
+    }
+    .toast.success{background:var(--success)}
+    .toast.warning{background:var(--warning)}
+    @keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}
+    .loading-overlay{
+      position:fixed;top:0;left:0;right:0;bottom:0;
+      background:rgba(0,0,0,0.7);display:none;align-items:center;
+      justify-content:center;z-index:2000;
+    }
+    .loading-overlay.active{display:flex}
+    .loading-content{
+      background:white;padding:30px;border-radius:12px;text-align:center;
+      box-shadow:0 8px 32px rgba(0,0,0,0.3);
+    }
+    .spinner{
+      border:4px solid #f3f3f3;border-top:4px solid var(--accent);
+      border-radius:50%;width:50px;height:50px;animation:spin 1s linear infinite;
+      margin:0 auto 16px;
+    }
+    @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    .lightbox{
+      display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+      background:rgba(0,0,0,0.9);z-index:3000;align-items:center;
+      justify-content:center;padding:20px;
+    }
+    .lightbox.active{display:flex}
+    .lightbox img{max-width:90%;max-height:90%;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+    .lightbox-close{
+      position:absolute;top:20px;right:20px;background:white;
+      border:none;width:40px;height:40px;border-radius:50%;
+      cursor:pointer;font-size:24px;line-height:1;
+    }
+    #pdfContent{display:none;width:794px;padding:28px;background:white;font-family:Inter,Arial,sans-serif}
+    .pdf-title{font-size:20px;font-weight:800;margin-bottom:6px;color:var(--accent)}
+    .pdf-sub{font-size:12px;color:#333;margin-bottom:12px}
+    .pdf-door{page-break-after:always;margin-bottom:12px;padding-bottom:8px;}
+    .pdf-door:last-child{page-break-after:auto;}
+    .pdf-door h4{margin:0 0 6px 0;font-size:18px;color:#F44336;font-weight:800;}
+    .pdf-option{margin-bottom:8px;font-size:13px;}
+    .pdf-option-label{font-weight:700;display:inline;}
+    .pdf-option-code{font-weight:700;color:var(--accent);display:inline;margin-left:4px;}
+    .pdf-photos{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:12px;
+      page-break-inside:avoid;
+    }
+    .pdf-photo-wrapper{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:200px;
+      border:1px solid #ccc;
+      padding:8px;
+      border-radius:6px;
+      background:#fafafa;
+    }
+    .pdf-photos img{
+      max-width:100% !important;
+      max-height:280px !important;
+      width:auto !important;
+      height:auto !important;
+      object-fit:contain !important;
+      display:block !important;
+    }
+    @media(max-width:700px){
+      .door-head{flex-direction:column;align-items:flex-start}
+      .door-actions{width:100%;justify-content:flex-start}
+      .btn{font-size:13px;padding:8px 12px}
+      .small{min-width:60px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <header>
+        <div>
+          <h1>Inbraakveilig — Opmetingsblad</h1>
+          <p>Vul klantgegevens in, voeg meerdere deuren toe en genereer één PDF met alle deuren & foto's.</p>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:800;color:var(--accent)">Inbraakveilig</div>
+        </div>
+      </header>
+
+      <div class="meta-grid" style="margin-top:14px">
+        <div><label>Standaard deurnaam (optioneel)</label><input id="doorField_global" type="text" placeholder="Bijv. Achterdeur (optioneel)"></div>
+        <div><label>Naam klant</label><input id="clientName" type="text" placeholder="Naam klant"></div>
+        <div><label>Project / Referentie</label><input id="projectRef" type="text" placeholder="Project / Ref"></div>
+        <div><label>Datum</label><input id="date" type="date"></div>
+        <div><label>Naam verkoper</label><input id="sellerName" type="text" placeholder="Naam verkoper"></div>
+        <div><label>Zoek opties</label><input id="searchInput" type="search" placeholder="Zoek op tekst of artikelnummer"></div>
+      </div>
+
+      <div class="controls" style="margin-top:12px">
+        <button id="addDoorBtn" class="btn btn-primary btn-red">➕ Deur toevoegen</button>
+        <button id="collapseAllBtn" class="btn btn-ghost">Alles inklappen</button>
+        <button id="expandAllBtn" class="btn btn-ghost">Alles uitklappen</button>
+        <button id="importBtn" class="btn btn-ghost">📥 Importeren</button>
+        <button id="exportBtn" class="btn btn-ghost">📤 Exporteren</button>
+        <div style="flex:1"></div>
+        <div style="font-size:13px" class="muted-very">Elke deur heeft z'n eigen artikels & foto's.</div>
+      </div>
+    </div>
+
+    <div id="doorContainer" class="card">
+      <div class="door-list" id="doorList"></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button id="generateBtn" class="btn btn-primary btn-red" style="flex:1">🧾 Genereer PDF (alle deuren)</button>
+        <button id="generateWordBtn" class="btn btn-success" style="flex:1">📄 Genereer Word Document</button>
+        <button id="clearAllBtn" class="btn btn-ghost" style="width:160px">Alles leegmaken</button>
+      </div>
+    </div>
+
+    <footer>© Inbraakveilig — lokaal formulier, geen server nodig</footer>
+  </div>
+
+  <template id="doorTemplate">
+    <div class="door" data-door-index="">
+      <div class="door-head">
+        <div style="display:flex;align-items:center;gap:12px;flex:1">
+          <div class="door-title">
+            Deur <span class="door-number"></span>
+            <span class="door-badge">0 geselecteerd</span>
+          </div>
+          <div style="min-width:260px;flex:1">
+            <label style="font-size:12px;color:var(--muted);margin-bottom:4px">Deurnaam / locatie (optioneel)</label>
+            <input type="text" class="door-name" placeholder="Bijv. Achterdeur, Garagedeur...">
+          </div>
+        </div>
+        <div class="door-actions">
+          <button class="btn btn-ghost btn-duplicate" title="Dupliceer deze deur">📋 Dupliceer</button>
+          <button class="btn btn-ghost btn-collapse">Vouw</button>
+          <button class="btn btn-ghost btn-remove">Verwijder</button>
+        </div>
+      </div>
+
+      <div class="door-body">
+        <div class="photo-section">
+          <label style="font-size:13px;font-weight:700;margin-bottom:8px;display:block">Foto's van deze deur</label>
+          <div class="photo-upload-zone">
+            <input type="file" accept="image/*" multiple class="door-photo-input" />
+            <div style="pointer-events:none">
+              <div style="font-size:32px;margin-bottom:8px">📷</div>
+              <div style="font-weight:600;margin-bottom:4px">Klik om foto's te uploaden</div>
+              <div style="font-size:12px;color:var(--muted)">of sleep foto's hierheen</div>
+            </div>
+          </div>
+          <div class="door-thumbs photos"></div>
+        </div>
+        <div class="options-container"></div>
+      </div>
+    </div>
+  </template>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <div style="font-weight:700;font-size:16px" id="loadingText">PDF wordt gegenereerd...</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:8px">Even geduld a.u.b.</div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" onclick="closeLightbox()">×</button>
+    <img id="lightboxImg" src="" alt="Preview">
+  </div>
+
+  <div id="pdfContent">
+    <div class="pdf-title">Inbraakveilig — Opmetingsblad</div>
+    <div class="pdf-sub" id="pdfMeta"></div>
+    <div id="pdfDoors"></div>
+  </div>
+
+  <input type="file" id="importFileInput" accept=".json" style="display:none">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+  <script>
+    (function(){
+      const doorList = document.getElementById('doorList');
+      const doorTemplate = document.getElementById('doorTemplate');
+      const addDoorBtn = document.getElementById('addDoorBtn');
+      const collapseAllBtn = document.getElementById('collapseAllBtn');
+      const expandAllBtn = document.getElementById('expandAllBtn');
+      const clearAllBtn = document.getElementById('clearAllBtn');
+      const generateBtn = document.getElementById('generateBtn');
+      const generateWordBtn = document.getElementById('generateWordBtn');
+      const searchInput = document.getElementById('searchInput');
+      const doorFieldGlobal = document.getElementById('doorField_global');
+      const exportBtn = document.getElementById('exportBtn');
+      const importBtn = document.getElementById('importBtn');
+      const importFileInput = document.getElementById('importFileInput');
+      const loadingOverlay = document.getElementById('loadingOverlay');
+
+      let doorCount = 0;
+
+      document.getElementById('date').valueAsDate = new Date();
+
+      const optionsData = [
+        {key:'3.7.1_fail_safe',label:'3.7.1* Levering elektrische ontsluiter fail safe RST00US',desc:'010485 — Levering elektrische ontsluiter fail safe',code:'010485',artikel:[{value:'010485',text:'010485 — RST00US: Electrische deuropener Fail Safe - 10-24V AC/DC met dagschootsignalering'}]},
+        {key:'3.7.1_fail_secure',label:'3.7.1* Levering elektrische ontsluiter fail secure ST00US',desc:'010484 — Levering elektrische ontsluiter fail secure',code:'010484',artikel:[{value:'010484',text:'010484 — ST00US: Electrische deuropener - Fail Secure - 10-24V AC/DC met dagschootsignalering'}]},
+        {key:'3.7.1_pai',label:'3.7.1* P.a.i. elektrische ontsluiter plaatsing',desc:'010787 — P.a.i. elektrische ontsluiter',code:'010787',artikel:[]},
+        {key:'3.7.2_rvs',label:'3.7.2* Levering RVS sluitplaat 32LP',desc:'010486 — 32LP: Lange sluitplaat RVS',code:'010486',artikel:[{value:'010486',text:'010486 — 32LP: Lange sluitplaat RVS'}]},
+        {key:'3.7.2_rvs_nonight',label:'3.7.2* Levering RVS sluitplaat zonder opening voor de nachtschoot',desc:'25135 — Lange sluitplaat RVS zonder nachtschootuitsparing',code:'25135',artikel:[{value:'25135',text:'25135 — Lange sluitplaat RVS zonder nachtschootuitsparing'}]},
+        {key:'3.7.2_pai',label:'3.7.2* P.a.i. sluitplaat plaatsing',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.3_blindrozet',label:'3.7.3* Levering blindrozet TL0152SS',desc:'24398 — Blind rozet 8mm rond inox',code:'24398',artikel:[{value:'24398',text:'24398 — Blind rozet 8mm rond inox'}]},
+        {key:'3.7.3_pai',label:'3.7.3* P.a.i. blindrozet plaatsing',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.4_ml420',label:'3.7.4* Levering motorslot 1-punt deurstijl met beperkte inbouwdiepte — ML420',desc:'25827 — ML420',code:'25827',artikel:[{value:'25827',text:'25827 — ML420 Elektrisch slot universeel 12V-24V DC'}]},
+        {key:'3.7.4_ml820',label:'3.7.4* Levering motorslot 1-punt deurstijl met uitlijnende correctie — ML820',desc:'25830 — ML820',code:'25830',artikel:[{value:'25830',text:'25830 — ML820 Elektrisch slot universeel 12V-24V DC'}]},
+        {key:'3.7.4_mb420',label:'3.7.4* Levering opbouwmodule voor motorslot deurstijl — MB420',desc:'25828 — MB420',code:'25828',artikel:[{value:'25828',text:'25828 — MB420 Opbouwbehuizing voor ML420'}]},
+        {key:'3.7.4_pai_inbouwen',label:'3.7.4* P.a.i. inbouwen van motorslot deurstijl',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.4_pai_opbouwen',label:'3.7.4* P.a.i. opbouwen van motorslot deurstijl met behulp van opbouwmodule',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.4_enkelzijdig',label:'3.7.4* Levering motorslot 1-punt deur - enkelzijdig',desc:'Kies artikel',code:'',artikel:[
+          {value:'25857',text:'25857 — Abloy EL432 24x235mm 92/45mm met sturing'},
+          {value:'25856',text:'25856 — Abloy EL432 24x235mm 92/40mm met sturing'},
+          {value:'25855',text:'25855 — Abloy EL432 24x235mm 92/35mm met sturing'},
+          {value:'25854',text:'25854 — Abloy EL432 24x235mm 92/30mm met sturing'},
+          {value:'24070',text:'24070 — Veiligheidsbeslag Dieckmann Kronos met Kernbeveiliging - 92'},
+          {value:'25858',text:'25858 — Abloy EL532 24x235mm 72/55mm met sturing'},
+          {value:'25859',text:'25859 — Abloy EL532 24x235mm 72/60mm met sturing'},
+          {value:'25860',text:'25860 — Abloy EL532 24x235mm 72/65mm met sturing'},
+          {value:'24060',text:'24060 — Veiligheidsbeslag Dieckmann Alpha met Kernbeveiliging - 72'},
+          {value:'25891',text:'25891 — Abloy kabel 10m tbv motorsloten'},
+          {value:'24766',text:'24766 — Vlakke sluitplaat satijn chroom afgerond, zonder lip'},
+          {value:'24767',text:'24767 — Vlakke sluitplaat satijn chroom afgerond, breedte 27mm, lip 3mm'},
+          {value:'24768',text:'24768 — Vlakke sluitplaat satijn chroom afgerond, breedte 30mm, lip 6mm'},
+          {value:'24769',text:'24769 — Vlakke sluitplaat satijn chroom afgerond, breedte 32mm, lip 8mm'}
+        ]},
+        {key:'3.7.4_dubbelzijdig',label:'3.7.4* Levering motorslot 1-punt deur - dubbelzijdig',desc:'Kies artikel',code:'',artikel:[
+          {value:'25846',text:'25846 — Abloy EL518 24x235mm 72/65mm'},
+          {value:'24763',text:'24763 — Abloy EL518 24x235mm 72/60mm'},
+          {value:'24762',text:'24762 — Abloy EL518 24x235mm 72/55mm'},
+          {value:'24060',text:'24060 — Dieckmann Alpha - 72'},
+          {value:'24758',text:'24758 — Abloy EL418 24x300mm 92/30mm'},
+          {value:'24759',text:'24759 — Abloy EL418 24x300mm 92/35mm'},
+          {value:'24760',text:'24760 — Abloy EL418 24x300mm 92/40mm'},
+          {value:'24761',text:'24761 — Abloy EL418 24x300mm 92/45mm'},
+          {value:'24070',text:'24070 — Dieckmann Kronos - 92'},
+          {value:'24765',text:'24765 — Abloy kabel 10m tbv motorsloten Certa Small Business'},
+          {value:'24766',text:'24766 — Vlakke sluitplaat - zonder lip'},
+          {value:'24767',text:'24767 — Vlakke sluitplaat - 27mm'},
+          {value:'24768',text:'24768 — Vlakke sluitplaat - 30mm'},
+          {value:'24769',text:'24769 — Vlakke sluitplaat - 32mm'}
+        ]},
+        {key:'3.7.4_pai_1punt_deurblad',label:'3.7.4* P.a.i. motorslot 1-punt deurblad',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.4_3punt_enkel',label:'3.7.4* Levering motorslot 3-punt deur - enkelzijdig',desc:'Kies artikel',code:'',artikel:[
+          {value:'25888',text:'25888 — Abloy MP520 3 punt vlakke voorplaat 24x1760mm 72/65mm'},
+          {value:'25887',text:'25887 — Abloy MP520 72/60mm'},
+          {value:'25886',text:'25886 — Abloy MP520 72/55mm'},
+          {value:'24060',text:'24060 — Dieckmann Alpha - 72'},
+          {value:'16251',text:'16251 — Veiligheidsrozet 11mm skg inox'},
+          {value:'16034',text:'16034 — Binnenschild Dieckmann met kruk (Asafstand 72)'},
+          {value:'25882',text:'25882 — Abloy MP420 92/30mm'},
+          {value:'25883',text:'25883 — Abloy MP420 92/35mm'},
+          {value:'25884',text:'25884 — Abloy MP420 92/40mm'},
+          {value:'25885',text:'25885 — Abloy MP420 92/45mm'},
+          {value:'24775',text:'24775 — Abloy kabel 10m tbv sloten'},
+          {value:'25889',text:'25889 — Abloy EA420 control unit'},
+          {value:'24070',text:'24070 — Dieckmann Kronos - 92'},
+          {value:'24408',text:'24408 — Security automatic anti-paniek 72/55 p/20'},
+          {value:'24409',text:'24409 — Security automatic anti-paniek 92/35 p/16'},
+          {value:'24414',text:'24414 — Security automatic anti-paniek 92/35 p/20'},
+          {value:'25434',text:'25434 — GU Secury automatische schieter DIN L'},
+          {value:'25433',text:'25433 — GU Secury automatische schieter DIN R'}
+        ]},
+        {key:'3.7.4_pai_3punt_deurblad',label:'3.7.4* P.a.i. motorslot 3-punt deurblad',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.5_slotvanger',label:'3.7.5* Levering elektrische slotvanger voor opbouw — MODULEC-SA-E',desc:'25892 — Locinox MODULEC-SA-E',code:'25892',artikel:[{value:'25892',text:'25892 — Locinox MODULEC-SA-E elektrische slotvanger opbouw RAL9005'}]},
+        {key:'3.7.5_pai',label:'3.7.5* P.a.i. elektrische slotvanger voor opbouw plaatsing',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.6_levering',label:'3.7.6* Levering elektrisch slot in opbouw voor hekwerk',desc:'Locinox LEKQ / LIKQ',code:'',artikel:[
+          {value:'25893',text:'25893 — Locinox LEKQ4 elek slot opbouw spanningsloos open'},
+          {value:'25884',text:'25884 — Locinox LIKQ4 elek slot opbouw spanningsloos gesloten'}
+        ]},
+        {key:'3.7.6_pai',label:'3.7.6* P.a.i. elektrisch slot in opbouw voor hekwerk',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.7_single',label:'3.7.7* Levering deurmagneet 17SSMDT',desc:'14752 — MAASLAND 17SSMDT',code:'14752',artikel:[{value:'14752',text:'14752 — MAASLAND 17SSMDT elektromagneet met deurstandsignalering & LED'}]},
+        {key:'3.7.7_double',label:'3.7.7* Levering deurmagneet dubbel 17DSMDT',desc:'14755 — Elektro magneet dubbel',code:'14755',artikel:[{value:'14755',text:'14755 — Elektro magneet dubbel opbouw 12V-24V DC'}]},
+        {key:'3.7.7_waterproof',label:'3.7.7* Levering deurmagneet roestvrij waterdicht 17WPM',desc:'23887 — waterdicht',code:'23887',artikel:[{value:'23887',text:'23887 — Smalle waterdichte vergrendeling'}]},
+        {key:'3.7.7_mounts',label:'3.7.7* Levering beugels of profielen voor opbouw deurmagneten — 17ZLC',desc:'14753 — beugels',code:'14753',artikel:[{value:'14753',text:'14753 — MAASLAND 17ZLC Z en L-steun met afdekkap'}]},
+        {key:'3.7.7_pai',label:'3.7.7* P.a.i. deurmagneet plaatsing',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.8_75',label:'3.7.8* Levering magneetstrip ongeveer 75 cm 17SGMDT',desc:'14760',code:'14760',artikel:[{value:'14760',text:'14760 — Elektro magneet opbouw 12V-24V DC'}]},
+        {key:'3.7.8_200',label:'3.7.8* Levering magneetstrip ongeveer 200 cm 17DGMDT',desc:'14761',code:'14761',artikel:[{value:'14761',text:'14761 — Electromagneet dubbel 2x signalering timer 12-24V'}]},
+        {key:'3.7.8_pai',label:'3.7.8* P.a.i. magneetstrip plaatsing',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.9_inbouw',label:'3.7.9* Levering kabeldoorvoer inbouw',desc:'010488 — DLF32R',code:'010488',artikel:[{value:'010488',text:'010488 — MAASLAND DLF32R kabelovergang inbouw - 120° - Verzinkt'}]},
+        {key:'3.7.9_pai_inbouw',label:'3.7.9* P.a.i. kabeldoorvoer inbouw',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.9_opbouw',label:'3.7.9* Levering kabeldoorvoer opbouw',desc:'14951 — DL050',code:'14951',artikel:[{value:'14951',text:'14951 — MAASLAND DL050 kabelovergang (50cm) - aluminium'}]},
+        {key:'3.7.9_pai_opbouw',label:'3.7.9* P.a.i. kabeldoorvoer opbouw',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.10_deurkruk_gewone',label:'3.7.10* Levering gewone deurkruk TL3106SS',desc:'24390 — U kruk 19mm',code:'24390',artikel:[{value:'24390',text:'24390 — U kruk 19mm met ronde rozet TL3106SS'}]},
+        {key:'3.7.10_deurkruk_vast',label:'3.7.10* Levering vaste deurkruk TL0401SS',desc:'24404 — vaste knop',code:'24404',artikel:[{value:'24404',text:'24404 — Vaste knop ronde rozet TL0401SS inox'}]},
+        {key:'3.7.10_pai_deurkruk',label:'3.7.10* P.a.i. deurkruk plaatsing',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.10_anti',label:'3.7.10* Levering anti-paniekslot',desc:'Meerdere varianten — kies artikel',code:'',artikel:[
+          {value:'25674',text:'25674 — BKS zelfvergrendelend 1-punt paniekslot 92/60 links'},
+          {value:'25673',text:'25673 — BKS zelfvergrendelend 1-punt paniekslot 92/60 rechts'},
+          {value:'25672',text:'25672 — BKS zelfvergrendelend 92/55 links'},
+          {value:'25671',text:'25671 — BKS zelfvergrendelend 92/55 rechts'},
+          {value:'25670',text:'25670 — BKS zelfvergrendelend 92/50 links'},
+          {value:'25669',text:'25669 — BKS zelfvergrendelend 92/50 rechts'},
+          {value:'25668',text:'25668 — BKS zelfvergrendelend 92/45 links'},
+          {value:'25667',text:'25667 — BKS zelfvergrendelend 92/45 rechts'},
+          {value:'25666',text:'25666 — BKS zelfvergrendelend 92/40 links'},
+          {value:'25665',text:'25665 — BKS zelfvergrendelend 92/40 rechts'},
+          {value:'25664',text:'25664 — BKS zelfvergrendelend 92/35 links'},
+          {value:'25663',text:'25663 — BKS zelfvergrendelend 92/35 rechts'},
+          {value:'25662',text:'25662 — BKS zelfvergrendelend 72/100 links'},
+          {value:'25661',text:'25661 — BKS zelfvergrendelend 72/100 rechts'},
+          {value:'25660',text:'25660 — BKS zelfvergrendelend 72/80 links'},
+          {value:'25659',text:'25659 — BKS zelfvergrendelend 72/80 rechts'},
+          {value:'25658',text:'25658 — BKS zelfvergrendelend 72/60 links'},
+          {value:'25657',text:'25657 — BKS zelfvergrendelend 72/60 rechts'},
+          {value:'25656',text:'25656 — BKS zelfvergrendelend 72/55 links'},
+          {value:'25655',text:'25655 — BKS zelfvergrendelend 72/55 rechts'},
+          {value:'25678',text:'25678 — ABLOY zelfvergrendelend 92/45'},
+          {value:'25677',text:'25677 — ABLOY 92/40'},
+          {value:'25676',text:'25676 — ABLOY 92/35'},
+          {value:'25675',text:'25675 — ABLOY 92/30'},
+          {value:'25682',text:'25682 — ABLOY 72/80'},
+          {value:'25681',text:'25681 — ABLOY 72/65'},
+          {value:'25680',text:'25680 — ABLOY 72/60'},
+          {value:'25679',text:'25679 — ABLOY 72/55'},
+          {value:'25683',text:'25683 — ABLOY 72/100'}
+        ]},
+        {key:'3.7.10_pai_anti',label:'3.7.10* P.a.i. anti-paniekslot plaatsing',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.10_paniekbaar',label:'3.7.10* Levering paniekbaar B-7400',desc:'BKS varianten',code:'',artikel:[
+          {value:'25440',text:'25440 — BKS anti-paniek PZ92 EV1'},
+          {value:'25439',text:'25439 — BKS anti-paniek PZ72 EV1'},
+          {value:'25438',text:'25438 — BKS anti-paniek UGL EV1'}
+        ]},
+        {key:'3.7.10_pai_paniekbaar',label:'3.7.10* P.a.i. paniekbaar plaatsing',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.11_light',label:'3.7.11* Levering deursluiter lichte deur — TS91',desc:'TS91 & accessoires',code:'',artikel:[
+          {value:'24328',text:'24328 — Deurpomp TS 91 B EN 3 / zilver'},
+          {value:'24334',text:'24334 — Deurpomp glijarm G-N / zilver'},
+          {value:'24341',text:'24341 — Deurpomp montageplaat TBV TS91 - TS92'},
+          {value:'25398',text:'25398 — Hoekconsole voor glijarm'}
+        ]},
+        {key:'3.7.11_heavy',label:'3.7.11* Levering deursluiter zware deur — TS93 EN5 + vastzetarm',desc:'TS93 & accessories',code:'',artikel:[
+          {value:'24331',text:'24331 — Deurpomp TS 93 B EN 2-5'},
+          {value:'25401',text:'25401 — Deurpomp TS 93 G EN 2-5'},
+          {value:'24334',text:'24334 — Deurpomp glijarm G-N'},
+          {value:'25398',text:'25398 — Hoekconsole'}
+        ]},
+        {key:'3.7.11_open_light',label:'3.7.11* Levering deursluiter met open stand lichte deur — TS91 + vastzetarm',desc:'TS91 open stand',code:'',artikel:[
+          {value:'24328',text:'24328 — TS 91 B EN 3'},
+          {value:'24334',text:'24334 — Glijarm G-N'},
+          {value:'24332',text:'24332 — Glijarm vastzetunit'},
+          {value:'24341',text:'24341 — Montageplaat'},
+          {value:'25398',text:'25398 — Hoekconsole'}
+        ]},
+        {key:'3.7.11_open_heavy',label:'3.7.11* Levering deursluiter met open stand zware deur — TS93 EN5 + vastzetarm',desc:'TS93 open stand zware deur',code:'',artikel:[
+          {value:'24331',text:'24331 — TS 93 B EN 2-5'},
+          {value:'25401',text:'25401 — TS 93 G EN 2-5'},
+          {value:'24334',text:'24334 — Glijarm G-N'},
+          {value:'24332',text:'24332 — Glijarm vastzetunit'},
+          {value:'25398',text:'25398 — Hoekconsole'},
+          {value:'25402',text:'25402 — TS 93 B EN 5-7'},
+          {value:'25403',text:'25403 — TS 93 G EN 5-7'}
+        ]},
+        {key:'3.7.11_pai',label:'3.7.11* P.a.i. deursluiter plaatsing',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'3.7.12_poortsluiter',label:'3.7.12* Levering hydraulische poortsluiter VERTICLOSE-2',desc:'25650 — Locinox Verticlose-2',code:'25650',artikel:[{value:'25650',text:'25650 — Locinox Verticlose-2-SILV hydraulische poortsluiter'}]},
+        {key:'3.7.12_pai',label:'3.7.12* P.a.i. hydraulische poortsluiter plaatsing',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'5.1_sleutel',label:'5.1* Levering van een gecertificeerde Mul-T-Lock sleutel',desc:'',code:'',artikel:[]},
+        {key:'5.1_cilinder',label:'5.1* Levering van een gecertificeerde Mul-T-Lock cilinder',desc:'',code:'',artikel:[]},
+        {key:'5.1_cilinder_draaiknop',label:'5.1* Cilinder met draaiknop',desc:'',code:'',artikel:[]},
+        {key:'5.1_pai_cilinder',label:'5.1* P.a.i. cilinder met draaiknop',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'5.1_hevelslot',label:'5.1* Levering hevelslot',desc:'',code:'',artikel:[]},
+        {key:'5.1_pai_hevelslot',label:'5.1* P.a.i. hevelslot',desc:'010787 — P.a.i.',code:'010787',artikel:[]},
+        {key:'5.2_werkuren',label:'5.2* Geschatte werkuren',desc:'Vul geschatte werkuren in',code:'',artikel:[]},
+        {key:'5.3_bijkomende_tekst',label:'5.3* Bijkomende tekst',desc:'Vul bijkomende tekst in',code:'',artikel:[]}
+      ];
+
+      function createOptionElement(optData){
+        const opt = document.createElement('div');
+        opt.className = 'option';
+        opt.dataset.key = optData.key;
+        opt.dataset.code = optData.code || '';
+        
+        const row = document.createElement('div');
+        row.className = 'option-row';
+        
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = 'opt-cb';
+        
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        
+        const label = document.createElement('label');
+        label.textContent = optData.label;
+        
+        const muted = document.createElement('div');
+        muted.className = 'muted';
+        muted.textContent = optData.desc;
+        
+        const textarea = document.createElement('textarea');
+        textarea.className = 'opt-comment';
+        textarea.placeholder = 'Opmerking (optioneel)';
+        
+        meta.appendChild(label);
+        meta.appendChild(muted);
+        meta.appendChild(textarea);
+        
+        row.appendChild(cb);
+        row.appendChild(meta);
+        
+        if(optData.code){
+          const small = document.createElement('div');
+          small.className = 'small';
+          small.textContent = '- ' + optData.code;
+          row.appendChild(small);
+        }
+        
+        opt.appendChild(row);
+        
+        if(optData.artikel && optData.artikel.length > 0){
+          const artikelBlock = document.createElement('div');
+          artikelBlock.className = 'artikel-block';
+          
+          const artikelLabel = document.createElement('label');
+          artikelLabel.textContent = 'Artikels';
+          
+          const select = document.createElement('select');
+          select.className = 'artikel-select opt-select';
+          
+          const defaultOpt = document.createElement('option');
+          defaultOpt.value = '';
+          defaultOpt.textContent = '-- kies artikel --';
+          select.appendChild(defaultOpt);
+          
+          optData.artikel.forEach(a => {
+            const option = document.createElement('option');
+            option.value = a.value;
+            option.textContent = a.text;
+            select.appendChild(option);
+          });
+          
+          const artikelList = document.createElement('div');
+          artikelList.className = 'artikel-list';
+          
+          const addBtn = document.createElement('button');
+          addBtn.className = 'artikel-add-btn';
+          addBtn.textContent = '+ Artikel toevoegen';
+          addBtn.type = 'button';
+          
+          addBtn.onclick = () => {
+            if(!select.value){
+              showToast('Selecteer eerst een artikel', 'warning');
+              return;
+            }
+            
+            const selectedText = select.options[select.selectedIndex].text;
+            const selectedValue = select.value;
+            
+            const existing = Array.from(artikelList.querySelectorAll('.artikel-item')).find(
+              item => item.dataset.value === selectedValue
+            );
+            if(existing){
+              showToast('Dit artikel is al toegevoegd', 'warning');
+              return;
+            }
+            
+            const item = document.createElement('div');
+            item.className = 'artikel-item';
+            item.dataset.value = selectedValue;
+            
+            const text = document.createElement('div');
+            text.className = 'artikel-item-text';
+            text.textContent = selectedText;
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'artikel-remove-btn';
+            removeBtn.textContent = 'Verwijder';
+            removeBtn.type = 'button';
+            removeBtn.onclick = () => {
+              item.remove();
+            };
+            
+            item.appendChild(text);
+            item.appendChild(removeBtn);
+            artikelList.appendChild(item);
+            
+            select.value = '';
+          };
+          
+          artikelBlock.appendChild(artikelLabel);
+          artikelBlock.appendChild(select);
+          artikelBlock.appendChild(addBtn);
+          artikelBlock.appendChild(artikelList);
+          opt.appendChild(artikelBlock);
+        }
+        
+        cb.addEventListener('change', () => {
+          if(cb.checked){
+            opt.classList.add('selected');
+          } else {
+            opt.classList.remove('selected');
+          }
+          updateDoorBadge(opt.closest('.door'));
+        });
+        
+        return opt;
+      }
+
+      function updateDoorBadge(doorEl){
+        const badge = doorEl.querySelector('.door-badge');
+        const checked = doorEl.querySelectorAll('.opt-cb:checked').length;
+        badge.textContent = `${checked} geselecteerd`;
+      }
+
+      function addDoor(prefillName, duplicateFrom){
+        doorCount++;
+        const clone = doorTemplate.content.cloneNode(true);
+        const doorEl = clone.querySelector('.door');
+        doorEl.dataset.doorIndex = doorCount;
+        doorEl.querySelector('.door-number').textContent = doorCount;
+        if(prefillName) doorEl.querySelector('.door-name').value = prefillName;
+
+        const optionsContainer = doorEl.querySelector('.options-container');
+        
+        optionsData.forEach(optData => {
+          const optEl = createOptionElement(optData);
+          optionsContainer.appendChild(optEl);
+        });
+
+        if(duplicateFrom){
+          const srcOpts = duplicateFrom.querySelectorAll('.option');
+          const destOpts = doorEl.querySelectorAll('.option');
+          srcOpts.forEach((srcOpt, idx) => {
+            const destOpt = destOpts[idx];
+            if(!destOpt) return;
+            
+            const srcCb = srcOpt.querySelector('.opt-cb');
+            const destCb = destOpt.querySelector('.opt-cb');
+            if(srcCb && destCb){
+              destCb.checked = srcCb.checked;
+              if(destCb.checked) destOpt.classList.add('selected');
+            }
+            
+            const srcComment = srcOpt.querySelector('.opt-comment');
+            const destComment = destOpt.querySelector('.opt-comment');
+            if(srcComment && destComment){
+              destComment.value = srcComment.value;
+            }
+            
+            const srcArtikelList = srcOpt.querySelector('.artikel-list');
+            const destArtikelList = destOpt.querySelector('.artikel-list');
+            if(srcArtikelList && destArtikelList){
+              const srcItems = srcArtikelList.querySelectorAll('.artikel-item');
+              srcItems.forEach(srcItem => {
+                const value = srcItem.dataset.value;
+                const text = srcItem.querySelector('.artikel-item-text').textContent;
+                
+                const item = document.createElement('div');
+                item.className = 'artikel-item';
+                item.dataset.value = value;
+                
+                const itemText = document.createElement('div');
+                itemText.className = 'artikel-item-text';
+                itemText.textContent = text;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'artikel-remove-btn';
+                removeBtn.textContent = 'Verwijder';
+                removeBtn.type = 'button';
+                removeBtn.onclick = () => item.remove();
+                
+                item.appendChild(itemText);
+                item.appendChild(removeBtn);
+                destArtikelList.appendChild(item);
+              });
+            }
+          });
+          
+          const srcPhotos = duplicateFrom._photosData || [];
+          doorEl._photosData = [...srcPhotos];
+          const thumbs = doorEl.querySelector('.door-thumbs');
+          srcPhotos.forEach(dataUrl => {
+            const img = document.createElement('img');
+            img.src = dataUrl;
+            img.className = 'thumb';
+            const container = document.createElement('div');
+            container.className = 'thumb-container';
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'thumb-remove';
+            removeBtn.textContent = '×';
+            removeBtn.onclick = () => removePhoto(doorEl, dataUrl);
+            container.appendChild(img);
+            container.appendChild(removeBtn);
+            img.onclick = () => openLightbox(dataUrl);
+            thumbs.appendChild(container);
+          });
+          
+          updateDoorBadge(doorEl);
+        }
+
+        doorEl.querySelector('.btn-remove').addEventListener('click', () => {
+          if(confirm('Deze deur verwijderen?')){
+            doorEl.remove();
+            updateDoorNumbers();
+          }
+        });
+
+        doorEl.querySelector('.btn-duplicate').addEventListener('click', () => {
+          addDoor(doorEl.querySelector('.door-name').value + ' (kopie)', doorEl);
+          showToast('Deur gedupliceerd!', 'success');
+        });
+
+        doorEl.querySelector('.btn-collapse').addEventListener('click', (e) => {
+          const body = doorEl.querySelector('.door-body');
+          if(body.style.display === 'none'){
+            body.style.display='';
+            e.target.textContent='Vouw';
+          } else {
+            body.style.display='none';
+            e.target.textContent='Open';
+          }
+        });
+
+        const photoZone = doorEl.querySelector('.photo-upload-zone');
+        const photoInput = doorEl.querySelector('.door-photo-input');
+        const thumbs = doorEl.querySelector('.door-thumbs');
+        doorEl._photosData = [];
+
+        photoZone.addEventListener('click', () => photoInput.click());
+        
+        photoZone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          photoZone.classList.add('dragover');
+        });
+        
+        photoZone.addEventListener('dragleave', () => {
+          photoZone.classList.remove('dragover');
+        });
+        
+        photoZone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          photoZone.classList.remove('dragover');
+          handleFiles(e.dataTransfer.files, doorEl);
+        });
+
+        photoInput.addEventListener('change', (ev) => {
+          handleFiles(ev.target.files, doorEl);
+        });
+
+        function handleFiles(files, door){
+          [...files].forEach(file => {
+            if(!file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = (e2) => {
+              const dataUrl = e2.target.result;
+              door._photosData.push(dataUrl);
+              
+              const img = document.createElement('img');
+              img.src = dataUrl;
+              img.className = 'thumb';
+              
+              const container = document.createElement('div');
+              container.className = 'thumb-container';
+              
+              const removeBtn = document.createElement('button');
+              removeBtn.className = 'thumb-remove';
+              removeBtn.textContent = '×';
+              removeBtn.onclick = () => removePhoto(door, dataUrl);
+              
+              container.appendChild(img);
+              container.appendChild(removeBtn);
+              
+              img.onclick = () => openLightbox(dataUrl);
+              
+              thumbs.appendChild(container);
+            };
+            reader.readAsDataURL(file);
+          });
+        }
+
+        doorList.appendChild(doorEl);
+        updateDoorNumbers();
+        return doorEl;
+      }
+
+      function removePhoto(doorEl, dataUrl){
+        const idx = doorEl._photosData.indexOf(dataUrl);
+        if(idx > -1){
+          doorEl._photosData.splice(idx, 1);
+          const thumbs = doorEl.querySelector('.door-thumbs');
+          thumbs.children[idx].remove();
+        }
+      }
+
+      function updateDoorNumbers(){
+        Array.from(doorList.querySelectorAll('.door')).forEach((d,i)=>{
+          d.dataset.doorIndex = i+1;
+          const num = d.querySelector('.door-number');
+          if(num) num.textContent = i+1;
+        });
+        doorCount = doorList.querySelectorAll('.door').length;
+      }
+
+      addDoorBtn.addEventListener('click', ()=> {
+        addDoor(doorFieldGlobal.value || '');
+      });
+
+      collapseAllBtn.addEventListener('click', ()=>{
+        doorList.querySelectorAll('.door .door-body').forEach(b=> b.style.display='none');
+        doorList.querySelectorAll('.btn-collapse').forEach(b=> b.textContent='Open');
+      });
+
+      expandAllBtn.addEventListener('click', ()=>{
+        doorList.querySelectorAll('.door .door-body').forEach(b=> b.style.display='');
+        doorList.querySelectorAll('.btn-collapse').forEach(b=> b.textContent='Vouw');
+      });
+
+      clearAllBtn.addEventListener('click', ()=>{
+        if(confirm('Alle deuren verwijderen? Dit kan niet ongedaan worden gemaakt.')){
+          doorList.innerHTML='';
+          doorCount=0;
+          showToast('Alles gewist', 'warning');
+        }
+      });
+
+      searchInput.addEventListener('input', ()=>{
+        const q = searchInput.value.trim().toLowerCase();
+        doorList.querySelectorAll('.door').forEach(door=>{
+          door.querySelectorAll('.option').forEach(opt=>{
+            const text = (opt.textContent||'').toLowerCase();
+            opt.style.display = text.includes(q) ? '' : 'none';
+          });
+        });
+      });
+
+      exportBtn.addEventListener('click', () => {
+        const data = {
+          meta: {
+            doorFieldGlobal: doorFieldGlobal.value,
+            clientName: document.getElementById('clientName').value,
+            projectRef: document.getElementById('projectRef').value,
+            date: document.getElementById('date').value,
+            sellerName: document.getElementById('sellerName').value
+          },
+          doors: []
+        };
+
+        doorList.querySelectorAll('.door').forEach(door => {
+          const doorData = {
+            name: door.querySelector('.door-name').value,
+            options: [],
+            photos: door._photosData || []
+          };
+
+          door.querySelectorAll('.option').forEach(opt => {
+            const cb = opt.querySelector('.opt-cb');
+            if(cb && cb.checked){
+              const artikelItems = [];
+              const artikelList = opt.querySelector('.artikel-list');
+              if(artikelList){
+                artikelList.querySelectorAll('.artikel-item').forEach(item => {
+                  artikelItems.push({
+                    value: item.dataset.value,
+                    text: item.querySelector('.artikel-item-text').textContent
+                  });
+                });
+              }
+              
+              const optData = {
+                key: opt.dataset.key,
+                comment: opt.querySelector('.opt-comment')?.value || '',
+                artikelItems: artikelItems
+              };
+              doorData.options.push(optData);
+            }
+          });
+
+          data.doors.push(doorData);
+        });
+
+        const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `inbraakveilig_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Data geëxporteerd!', 'success');
+      });
+
+      importBtn.addEventListener('click', () => {
+        importFileInput.click();
+      });
+
+      importFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const data = JSON.parse(ev.target.result);
+            
+            doorList.innerHTML = '';
+            doorCount = 0;
+            
+            if(data.meta){
+              doorFieldGlobal.value = data.meta.doorFieldGlobal || '';
+              document.getElementById('clientName').value = data.meta.clientName || '';
+              document.getElementById('projectRef').value = data.meta.projectRef || '';
+              document.getElementById('date').value = data.meta.date || '';
+              document.getElementById('sellerName').value = data.meta.sellerName || '';
+            }
+
+            if(data.doors && data.doors.length > 0){
+              data.doors.forEach(doorData => {
+                const door = addDoor(doorData.name);
+                
+                doorData.options.forEach(optData => {
+                  const opt = door.querySelector(`.option[data-key="${optData.key}"]`);
+                  if(opt){
+                    const cb = opt.querySelector('.opt-cb');
+                    if(cb){
+                      cb.checked = true;
+                      opt.classList.add('selected');
+                    }
+                    
+                    const comment = opt.querySelector('.opt-comment');
+                    if(comment) comment.value = optData.comment;
+                    
+                    if(optData.artikelItems && optData.artikelItems.length > 0){
+                      const artikelList = opt.querySelector('.artikel-list');
+                      if(artikelList){
+                        optData.artikelItems.forEach(itemData => {
+                          const item = document.createElement('div');
+                          item.className = 'artikel-item';
+                          item.dataset.value = itemData.value;
+                          
+                          const text = document.createElement('div');
+                          text.className = 'artikel-item-text';
+                          text.textContent = itemData.text;
+                          
+                          const removeBtn = document.createElement('button');
+                          removeBtn.className = 'artikel-remove-btn';
+                          removeBtn.textContent = 'Verwijder';
+                          removeBtn.type = 'button';
+                          removeBtn.onclick = () => item.remove();
+                          
+                          item.appendChild(text);
+                          item.appendChild(removeBtn);
+                          artikelList.appendChild(item);
+                        });
+                      }
+                    }
+                  }
+                });
+                
+                if(doorData.photos){
+                  door._photosData = doorData.photos;
+                  const thumbs = door.querySelector('.door-thumbs');
+                  doorData.photos.forEach(dataUrl => {
+                    const img = document.createElement('img');
+                    img.src = dataUrl;
+                    img.className = 'thumb';
+                    const container = document.createElement('div');
+                    container.className = 'thumb-container';
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'thumb-remove';
+                    removeBtn.textContent = '×';
+                    removeBtn.onclick = () => removePhoto(door, dataUrl);
+                    container.appendChild(img);
+                    container.appendChild(removeBtn);
+                    img.onclick = () => openLightbox(dataUrl);
+                    thumbs.appendChild(container);
+                  });
+                }
+                
+                updateDoorBadge(door);
+              });
+            }
+            
+            showToast('Data geïmporteerd!', 'success');
+          } catch(err){
+            showToast('Ongeldige data', 'warning');
+          }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+      });
+
+      function showToast(message, type = 'success'){
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+          toast.remove();
+        }, 3000);
+      }
+
+      window.openLightbox = function(src){
+        document.getElementById('lightboxImg').src = src;
+        document.getElementById('lightbox').classList.add('active');
+      };
+
+      window.closeLightbox = function(){
+        document.getElementById('lightbox').classList.remove('active');
+      };
+
+      document.getElementById('lightbox').addEventListener('click', (e) => {
+        if(e.target.id === 'lightbox') closeLightbox();
+      });
+
+      async function waitImgs(container){
+        const imgs = [...container.querySelectorAll('img')];
+        await Promise.all(imgs.map(i=> i.complete?Promise.resolve():new Promise(r=>{i.onload=r;i.onerror=r;})));
+      }
+
+      generateBtn.addEventListener('click', async ()=>{
+        const doors = doorList.querySelectorAll('.door');
+        if(doors.length === 0){
+          showToast('Voeg eerst minstens één deur toe', 'warning');
+          return;
+        }
+
+        let hasSelections = false;
+        doors.forEach(door => {
+          if(door.querySelectorAll('.opt-cb:checked').length > 0){
+            hasSelections = true;
+          }
+        });
+
+        if(!hasSelections){
+          if(!confirm('Er zijn geen opties geselecteerd. Toch doorgaan met PDF genereren?')){
+            return;
+          }
+        }
+
+        loadingOverlay.classList.add('active');
+        document.getElementById('loadingText').textContent = 'PDF wordt gegenereerd...';
+
+        try {
+          const client = document.getElementById('clientName').value || '-';
+          const project = document.getElementById('projectRef').value || '-';
+          const date = document.getElementById('date').value || (new Date()).toLocaleDateString();
+          const seller = document.getElementById('sellerName').value || '-';
+
+          const pdfMeta = document.getElementById('pdfMeta');
+          pdfMeta.innerHTML = `Deur: ${escapeHtml(doorFieldGlobal.value||'-')} | Klant: ${escapeHtml(client)} | Project: ${escapeHtml(project)} | Datum: ${escapeHtml(date)} | Verkoper: ${escapeHtml(seller)}<div style='margin-top:6px;font-weight:800;color:${getComputedStyle(document.body).getPropertyValue('--accent')}'>Inbraakveilig</div>`;
+
+          const pdfDoors = document.getElementById('pdfDoors');
+          pdfDoors.innerHTML = '';
+
+          doors.forEach((door, idx)=>{
+            const title = door.querySelector('.door-name').value || `Deur ${idx+1}`;
+            const doorBlock = document.createElement('div');
+            doorBlock.className = 'pdf-door';
+            const h = document.createElement('h4');
+            h.textContent = `${title}`;
+            doorBlock.appendChild(h);
+
+            const opts = door.querySelectorAll('.option');
+            opts.forEach(opt=>{
+              const cb = opt.querySelector('.opt-cb');
+              if(!cb) return;
+              if(cb.checked){
+                const label = opt.querySelector('label') ? opt.querySelector('label').innerText : '';
+                const comment = opt.querySelector('.opt-comment') ? opt.querySelector('.opt-comment').value : '';
+                const code = opt.dataset.code || '';
+                
+                const artikelList = opt.querySelector('.artikel-list');
+                let artikelTexts = [];
+                if(artikelList){
+                  artikelList.querySelectorAll('.artikel-item').forEach(item => {
+                    artikelTexts.push(item.querySelector('.artikel-item-text').textContent);
+                  });
+                }
+                
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'pdf-option';
+                
+                const labelSpan = document.createElement('span');
+                labelSpan.className = 'pdf-option-label';
+                labelSpan.textContent = label;
+                optionDiv.appendChild(labelSpan);
+                
+                if(code){
+                  const codeSpan = document.createElement('span');
+                  codeSpan.className = 'pdf-option-code';
+                  codeSpan.textContent = ' - ' + code;
+                  optionDiv.appendChild(codeSpan);
+                }
+                
+                doorBlock.appendChild(optionDiv);
+                
+                if(artikelTexts.length > 0){
+                  const artikelDiv = document.createElement('div');
+                  artikelDiv.style.fontSize = '12px';
+                  artikelDiv.style.marginLeft = '10px';
+                  artikelDiv.style.marginBottom = '6px';
+                  artikelDiv.innerHTML = artikelTexts.map(t => escapeHtml(t)).join('<br>');
+                  doorBlock.appendChild(artikelDiv);
+                }
+                if(comment){
+                  const commentDiv = document.createElement('div');
+                  commentDiv.style.fontSize = '12px';
+                  commentDiv.style.marginLeft = '10px';
+                  commentDiv.style.marginBottom = '8px';
+                  commentDiv.textContent = comment;
+                  doorBlock.appendChild(commentDiv);
+                }
+              }
+            });
+
+            const photosDiv = document.createElement('div');
+            photosDiv.className = 'pdf-photos';
+            const thumbs = door.querySelectorAll('.door-thumbs img');
+            thumbs.forEach(t=>{
+              const wrapper = document.createElement('div');
+              wrapper.className = 'pdf-photo-wrapper';
+              const im = document.createElement('img');
+              im.src = t.src;
+              wrapper.appendChild(im);
+              photosDiv.appendChild(wrapper);
+            });
+            if(thumbs.length) doorBlock.appendChild(photosDiv);
+
+            pdfDoors.appendChild(doorBlock);
+          });
+
+          const el = document.getElementById('pdfContent');
+          el.style.display = 'block';
+          await waitImgs(el);
+
+          const filenameClient = (client || 'anon').replace(/\s+/g,'_').replace(/[^\w\-_.]/g,'');
+          const opt = {
+            margin:10,
+            filename:`Opmetingsblad_${filenameClient}.pdf`,
+            image:{type:'jpeg',quality:0.92},
+            html2canvas:{scale:2},
+            jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+          };
+
+          await html2pdf().set(opt).from(el).save();
+          el.style.display='none';
+          showToast('PDF succesvol gegenereerd!', 'success');
+        } catch(e){
+          showToast('PDF-generatie mislukt: ' + e.message, 'warning');
+        } finally {
+          loadingOverlay.classList.remove('active');
+        }
+      });
+
+      generateWordBtn.addEventListener('click', async ()=>{
+        const doors = doorList.querySelectorAll('.door');
+        if(doors.length === 0){
+          showToast('Voeg eerst minstens één deur toe', 'warning');
+          return;
+        }
+
+        loadingOverlay.classList.add('active');
+        document.getElementById('loadingText').textContent = 'Word document wordt gegenereerd...';
+
+        try {
+          const client = document.getElementById('clientName').value || '-';
+          const project = document.getElementById('projectRef').value || '-';
+          const date = document.getElementById('date').value || (new Date()).toLocaleDateString();
+          const seller = document.getElementById('sellerName').value || '-';
+          const doorGlobal = doorFieldGlobal.value || '-';
+
+          if(typeof docx === 'undefined'){
+            throw new Error('docx library niet geladen. Probeer de pagina te verversen.');
+          }
+
+          const { Document, Paragraph, TextRun, HeadingLevel, AlignmentType, ImageRun } = docx;
+
+          const children = [];
+
+          children.push(
+            new Paragraph({
+              text: 'Inbraakveilig — Opmetingsblad',
+              heading: HeadingLevel.HEADING_1,
+              alignment: AlignmentType.CENTER
+            })
+          );
+
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: `Deur: ${doorGlobal} | Klant: ${client} | Project: ${project} | Datum: ${date} | Verkoper: ${seller}`, size: 20 })
+              ],
+              spacing: { after: 200 }
+            })
+          );
+
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'Inbraakveilig', bold: true, size: 24 })
+              ],
+              spacing: { after: 400 }
+            })
+          );
+
+          for(let i = 0; i < doors.length; i++){
+            const door = doors[i];
+            const title = door.querySelector('.door-name').value || `Deur ${i+1}`;
+
+            children.push(
+              new Paragraph({
+                text: title,
+                heading: HeadingLevel.HEADING_2,
+                spacing: { before: 400, after: 200 }
+              })
+            );
+
+            const opts = door.querySelectorAll('.option');
+            opts.forEach(opt=>{
+              const cb = opt.querySelector('.opt-cb');
+              if(!cb || !cb.checked) return;
+
+              const label = opt.querySelector('label') ? opt.querySelector('label').innerText : '';
+              const comment = opt.querySelector('.opt-comment') ? opt.querySelector('.opt-comment').value : '';
+              const code = opt.dataset.code || '';
+
+              const labelText = code ? `${label} - ${code}` : label;
+              children.push(
+                new Paragraph({
+                  children: [
+                    new TextRun({ text: labelText, bold: true })
+                  ],
+                  spacing: { after: 100 }
+                })
+              );
+
+              const artikelList = opt.querySelector('.artikel-list');
+              if(artikelList){
+                artikelList.querySelectorAll('.artikel-item').forEach(item => {
+                  const text = item.querySelector('.artikel-item-text').textContent;
+                  children.push(
+                    new Paragraph({
+                      text: text,
+                      spacing: { after: 100 }
+                    })
+                  );
+                });
+              }
+
+              if(comment){
+                children.push(
+                  new Paragraph({
+                    text: comment,
+                    spacing: { after: 200 }
+                  })
+                );
+              }
+            });
+
+            const thumbs = door.querySelectorAll('.door-thumbs img');
+            if(thumbs.length > 0){
+              children.push(
+                new Paragraph({
+                  text: 'Foto\'s:',
+                  bold: true,
+                  spacing: { before: 200, after: 100 }
+                })
+              );
+
+              for(let j = 0; j < thumbs.length; j++){
+                const img = thumbs[j];
+                try {
+                  const base64Data = img.src.split(',')[1];
+                  const imageRun = new ImageRun({
+                    data: Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)),
+                    transformation: {
+                      width: 300,
+                      height: 300
+                    }
+                  });
+                  children.push(
+                    new Paragraph({
+                      children: [imageRun],
+                      spacing: { after: 200 }
+                    })
+                  );
+                } catch(e){
+                  console.error('Error adding image:', e);
+                }
+              }
+            }
+
+            if(i < doors.length - 1){
+              children.push(
+                new Paragraph({
+                  pageBreakBefore: true
+                })
+              );
+            }
+          }
+
+          const doc = new Document({
+            sections: [{
+              properties: {},
+              children: children
+            }]
+          });
+
+          const blob = await docx.Packer.toBlob(doc);
+          const filenameClient = (client || 'anon').replace(/\s+/g,'_').replace(/[^\w\-_.]/g,'');
+          saveAs(blob, `Opmetingsblad_${filenameClient}.docx`);
+          
+          showToast('Word document succesvol gegenereerd!', 'success');
+        } catch(e){
+          console.error('Word generation error:', e);
+          showToast('Word-generatie mislukt: ' + e.message, 'warning');
+        } finally {
+          loadingOverlay.classList.remove('active');
+        }
+      });
+
+      function escapeHtml(s){ 
+        return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); 
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if((e.ctrlKey || e.metaKey) && e.key === 'd'){
+          e.preventDefault();
+          addDoor(doorFieldGlobal.value || '');
+          showToast('Nieuwe deur toegevoegd', 'success');
+        }
+        
+        if(e.key === 'Escape'){
+          closeLightbox();
+        }
+      });
+
+      addDoor(doorFieldGlobal.value || '');
+
+    })();
+  </script>
+</body>
+</html>
